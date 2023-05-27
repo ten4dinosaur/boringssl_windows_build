@@ -1,0 +1,38 @@
+name: Build
+
+on: workflow_dispatch 
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        arch: [x86, x64]
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install NASM
+      run: choco install --confirm nasm
+
+    - name: Clone BoringSSL
+      run: git clone --recursive https://github.com/google/boringssl.git
+
+    - name: Patch CMakeLists
+      run: powershell -c "((Get-Content -path boringssl\CMakeLists.txt -Raw) -replace 'boringssl_gtest third_party','boringssl_gtest STATIC third_party') | Set-Content -Path boringssl\CMakeLists.txt"
+
+    - name: Install Clang
+      run: python boringssl\util\bot\update_clang.py
+
+    - name: Build
+      run: cmd /c build.bat ${{ matrix.arch }}
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build ${{ matrix.arch }}
+        path: ./boringssl/build/build.zip
+        retention-days: 30
