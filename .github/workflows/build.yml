@@ -21,8 +21,8 @@ jobs:
     - name: Clone BoringSSL
       run: git clone --recursive https://github.com/google/boringssl.git
 
-    - name: Patch CMakeLists
-      run: powershell -c "((Get-Content -path boringssl\CMakeLists.txt -Raw) -replace 'boringssl_gtest third_party','boringssl_gtest STATIC third_party') | Set-Content -Path boringssl\CMakeLists.txt"
+#    - name: Patch CMakeLists
+#      run: powershell -c "((Get-Content -path boringssl\CMakeLists.txt -Raw) -replace 'boringssl_gtest third_party','boringssl_gtest STATIC third_party') | Set-Content -Path boringssl\CMakeLists.txt"
 
     - name: Install Clang
       run: python boringssl\util\bot\update_clang.py
